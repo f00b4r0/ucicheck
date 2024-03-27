@@ -28,7 +28,7 @@
 %verbose
 
 %token PACKAGE CONFIG OPTION NEWLINE
-%token IDENTIFIER STRING
+%token IDENTIFIER VALUE
 
 %%
 
@@ -40,14 +40,16 @@ stmtlist: /* empty */
 	| stmtlist error NEWLINE	{ yyerrok; if (++retval >= 5) { fprintf(stderr, "TOO MANY ERRORS, ABORTING!\n"); YYABORT; } }
 ;
 
-stmt:	PACKAGE IDENTIFIER
-	| CONFIG IDENTIFIER
-	| CONFIG IDENTIFIER value
-	| OPTION IDENTIFIER		{ yyerror("missing value"); YYERROR; }
-	| OPTION IDENTIFIER value
+stmt:	PACKAGE ident
+	| CONFIG ident
+	| CONFIG ident VALUE
+	| OPTION ident		{ if (!YYRECOVERING()) { yyerror("missing value"); YYERROR; } }
+	| OPTION ident VALUE
 ;
 
-value: IDENTIFIER | STRING ;
+ident: IDENTIFIER
+	| error			{ yyerror("invalid identifier"); }
+;
 
 %%
 

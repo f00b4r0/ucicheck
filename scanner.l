@@ -16,7 +16,10 @@
 %option nodebug
 %option yylineno
 
+%x PACKNAME IDENT DATA
+
 IDENTPART		[A-Za-z0-9_]
+PACKPART		[-A-Za-z0-9_]
 
 %{
 	#include "parser.tab.h"
@@ -25,31 +28,39 @@ IDENTPART		[A-Za-z0-9_]
 
 %%
 	/* consecutive new lines */
-\n+		{ return NEWLINE; }
-
-	/* keywords */
-package		{ return PACKAGE; }
-config		{ return CONFIG; }
-option		|
-list		{ return OPTION; }
+<*>\n+		{ BEGIN(INITIAL); return NEWLINE; }
 
 	/* comments */
-#.*			/* ignore comments */
+<*>#.*			/* ignore comments */
+
+	/* keywords */
+package		{ BEGIN(PACKNAME); return PACKAGE; }
+config		{ BEGIN(IDENT); return CONFIG; }
+option		|
+list		{ BEGIN(IDENT); return OPTION; }
+
+	/* package names */
+<PACKNAME>{PACKPART}+		|
+<PACKNAME>'{PACKPART}+'		|
+<PACKNAME>\"{PACKPART}+\"	{ return IDENTIFIER; }
 
 	/* identifiers */
-{IDENTPART}+		|
-'{IDENTPART}+'		|
-\"{IDENTPART}+\"	{ return IDENTIFIER; }
+<IDENT>{IDENTPART}+		|
+<IDENT>'{IDENTPART}+'		|
+<IDENT>\"{IDENTPART}+\"		{ return IDENTIFIER; }
 
+<IDENT>{IDENTPART}+/[ \t]+	|
+<IDENT>'{IDENTPART}+'/[ \t]+	|
+<IDENT>\"{IDENTPART}+\"/[ \t]+	{ BEGIN(DATA); return IDENTIFIER; }
 
 	/* user strings */
-[^ '\t\"\n]+		|			/* unquoted, without whitespace */
-'[^'\n]*'		|			/* single quoted */
-\"[^\"\n]*\"		{ return STRING; }	/* double quoted */
+<DATA>[^ '\t\"\n]+	|			/* unquoted, without whitespace */
+<DATA>'[^'\n]*'		|			/* single quoted */
+<DATA>\"[^\"\n]*\"	{ return VALUE; }	/* double quoted */
 
-[ \t]+			/* ignore whitespace */
+<*>[ \t]+		/* ignore whitespace */
 
-.			{ yyerror("spurious character '%c'", *yytext); return YYerror; }
+<*>.			{ yyerror("spurious character '%c'", *yytext); return YYerror; }
 
 <<EOF>>			{ yyterminate(); }
 %%
