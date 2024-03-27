@@ -44,8 +44,8 @@ list		{ return OPTION; }
 
 	/* user strings */
 [^ '\t\"\n]+		|			/* unquoted, without whitespace */
-'[^'\n]+'		|			/* single quoted */
-\"[^\"\n]+\"		{ return STRING; }	/* double quoted */
+'[^'\n]*'		|			/* single quoted */
+\"[^\"\n]*\"		{ return STRING; }	/* double quoted */
 
 [ \t]+			/* ignore whitespace */
 
