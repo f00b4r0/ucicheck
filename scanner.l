@@ -20,7 +20,7 @@ IDENTPART		[A-Za-z0-9_]
 
 %{
 	#include "parser.tab.h"
-	extern const char *filename;
+	extern void yyerror(const char *, ...);
 %}
 
 %%
@@ -49,7 +49,7 @@ list		{ return OPTION; }
 
 [ \t]+			/* ignore whitespace */
 
-.			{ fprintf(stderr, "%s: error line %d: spurious character '%c'\n", filename, yylineno, *yytext); return YYerror; }
+.			{ yyerror("spurious character '%c'", *yytext); return YYerror; }
 
 <<EOF>>			{ yyterminate(); }
 %%

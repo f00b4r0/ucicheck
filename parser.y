@@ -12,12 +12,15 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include <stdarg.h>
+
+	void yyerror(const char *, ...);
 
 	extern int yylineno;
 	extern int yylex();
 	extern FILE *yyin;
-	void yyerror(const char *);
-	const char *filename;
+
+	static const char *filename;
 	static int retval = 0;
 %}
 
@@ -67,8 +70,14 @@ int main(int argc, char **argv)
 	return retval;
 }
 
-void yyerror(const char *msg)
+void yyerror(const char *msg, ...)
 {
-	fprintf(stderr, "%s: error line %d: %s\n", filename, yylineno, msg);
+	va_list ap;
+
+	va_start(ap, msg);
+	fprintf(stderr, "%s: error line %d: ", filename, yylineno);
+	vfprintf(stderr, msg, ap);
+	va_end(ap);
+	fprintf(stderr, "\n");
 }
 
