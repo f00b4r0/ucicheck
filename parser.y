@@ -18,6 +18,7 @@
 	extern FILE *yyin;
 	void yyerror(const char *);
 	const char *filename;
+	static int retval = 0;
 %}
 
 %define parse.error verbose
@@ -30,13 +31,16 @@
 
 start: stmtlist ;
 
-stmtlist: stmt | stmtlist NEWLINE stmt ;
+stmtlist: /* empty */
+	| stmtlist NEWLINE
+	| stmtlist stmt NEWLINE
+	| stmtlist error NEWLINE	{ retval = 1; }
+;
 
-stmt: /* empty */
-	| PACKAGE IDENTIFIER
+stmt:	PACKAGE IDENTIFIER
 	| CONFIG IDENTIFIER
 	| CONFIG IDENTIFIER value
-	| OPTION IDENTIFIER		{ yyerror("missing value"); YYABORT; }
+	| OPTION IDENTIFIER		{ yyerror("missing value"); YYERROR; }
 	| OPTION IDENTIFIER value
 ;
 
@@ -58,7 +62,9 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 
-	return yyparse();
+	yyparse();
+	fclose(yyin);
+	return retval;
 }
 
 void yyerror(const char *msg)
