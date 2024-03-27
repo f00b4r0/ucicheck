@@ -37,7 +37,7 @@ start: stmtlist ;
 stmtlist: /* empty */
 	| stmtlist NEWLINE
 	| stmtlist stmt NEWLINE
-	| stmtlist error NEWLINE	{ retval = 1; }
+	| stmtlist error NEWLINE	{ yyerrok; if (++retval >= 5) { fprintf(stderr, "TOO MANY ERRORS, ABORTING!\n"); YYABORT; } }
 ;
 
 stmt:	PACKAGE IDENTIFIER
