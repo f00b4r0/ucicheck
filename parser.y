@@ -37,18 +37,14 @@ start: stmtlist ;
 stmtlist: /* empty */
 	| stmtlist NEWLINE
 	| stmtlist stmt NEWLINE
-	| stmtlist error NEWLINE	{ yyerrok; if (++retval >= 5) { fprintf(stderr, "TOO MANY ERRORS, ABORTING!\n"); YYABORT; } }
+	| stmtlist error NEWLINE	{ yyerrok; if (++retval >= 10) { fprintf(stderr, "TOO MANY ERRORS, ABORTING!\n"); YYABORT; } }
 ;
 
-stmt:	PACKAGE ident
-	| CONFIG ident
-	| CONFIG ident VALUE
-	| OPTION ident		{ if (!YYRECOVERING()) { yyerror("missing value"); YYERROR; } }
-	| OPTION ident VALUE
-;
-
-ident: IDENTIFIER
-	| error			{ yyerror("invalid identifier"); }
+stmt:	PACKAGE IDENTIFIER
+	| CONFIG IDENTIFIER
+	| CONFIG IDENTIFIER VALUE
+	| OPTION IDENTIFIER		{ if (!YYRECOVERING()) { yyerror("missing value"); YYERROR; } }
+	| OPTION IDENTIFIER VALUE
 ;
 
 %%

@@ -16,7 +16,7 @@
 %option nodebug
 %option yylineno
 
-%x PACKNAME IDENT DATA
+%x PACKNAME IDENT DATA ERROR
 
 IDENTPART		[A-Za-z0-9_]
 PACKPART		[-A-Za-z0-9_]
@@ -38,6 +38,7 @@ package		{ BEGIN(PACKNAME); return PACKAGE; }
 config		{ BEGIN(IDENT); return CONFIG; }
 option		|
 list		{ BEGIN(IDENT); return OPTION; }
+[^ \t\n]+	{ yyerror("unknown keyword: %s", yytext); BEGIN(ERROR); return YYerror; }
 
 	/* package names */
 <PACKNAME>{PACKPART}+		|
@@ -47,11 +48,9 @@ list		{ BEGIN(IDENT); return OPTION; }
 	/* identifiers */
 <IDENT>{IDENTPART}+		|
 <IDENT>'{IDENTPART}+'		|
-<IDENT>\"{IDENTPART}+\"		{ return IDENTIFIER; }
+<IDENT>\"{IDENTPART}+\"		{ BEGIN(DATA); return IDENTIFIER; }
 
-<IDENT>{IDENTPART}+/[ \t]+	|
-<IDENT>'{IDENTPART}+'/[ \t]+	|
-<IDENT>\"{IDENTPART}+\"/[ \t]+	{ BEGIN(DATA); return IDENTIFIER; }
+<PACKNAME,IDENT>[^ \t\n]+	{ yyerror("invalid identifier: %s", yytext); return YYerror; }
 
 	/* user strings */
 <DATA>[^ '\t\"\n]+	|			/* unquoted, without whitespace */
@@ -60,7 +59,9 @@ list		{ BEGIN(IDENT); return OPTION; }
 
 <*>[ \t]+		/* ignore whitespace */
 
-<*>.			{ yyerror("spurious character '%c'", *yytext); return YYerror; }
+<*>.			{ yyerror("spurious character '%c'", *yytext); BEGIN(ERROR); return YYerror; }
+
+<ERROR>.*		/* ignore rest of line */
 
 <<EOF>>			{ yyterminate(); }
 %%
