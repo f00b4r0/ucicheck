@@ -1,0 +1,6 @@
+/ucicheck
+*.o
+# ignore flex/bison intermediary files
+*.tab.[ch]
+*.lex.[ch]
+*.output
