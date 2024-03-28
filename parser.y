@@ -22,7 +22,7 @@
 	extern FILE *yyin;
 
 	static const char *filename;
-	static int retval = 0;
+	static int retval = 0, prevline = 0;
 %}
 
 %define parse.error verbose
@@ -44,7 +44,7 @@ stmtlist: /* empty */
 stmt:	PACKAGE IDENTIFIER
 	| CONFIG IDENTIFIER
 	| CONFIG IDENTIFIER VALUE
-	| OPTION IDENTIFIER		{ if (!YYRECOVERING()) { yyerror("missing value"); YYERROR; } }
+	| OPTION IDENTIFIER		{ if (!YYRECOVERING()) { prevline = 1; yyerror("missing value"); YYERROR; } }
 	| OPTION IDENTIFIER VALUE
 ;
 
@@ -74,9 +74,10 @@ void yyerror(const char *msg, ...)
 	va_list ap;
 
 	va_start(ap, msg);
-	fprintf(stderr, "%s: error line %d: ", filename, yylineno);
+	fprintf(stderr, "%s: error line %d: ", filename, yylineno-prevline);
 	vfprintf(stderr, msg, ap);
 	va_end(ap);
 	fprintf(stderr, "\n");
+	prevline = 0;
 }
 
