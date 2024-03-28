@@ -27,8 +27,8 @@ PACKPART		[-A-Za-z0-9_]
 %}
 
 %%
-	/* consecutive new lines */
-<*>\n+		{ BEGIN(INITIAL); return NEWLINE; }
+	/* new lines */
+<*>\n		{ BEGIN(INITIAL); return NEWLINE; }
 
 	/* comments */
 <*>#.*			/* ignore comments */
