@@ -18,7 +18,7 @@
 
 %x PACKNAME IDENT DATA ERROR
 
-IDENTPART		[A-Za-z0-9_]
+IDENTPART		[-A-Za-z0-9_]
 PACKPART		[-A-Za-z0-9_]
 
 %{
