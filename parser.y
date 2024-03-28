@@ -4,6 +4,7 @@
 //
 //  https://openwrt.org/docs/guide-user/base-system/uci#file_syntax
 //  Will catch all errors, but not necessarily report them very user-friendly
+//  Requires input to have a terminating newline
 //
 //  (C) 2024 Thibaut VARENE
 //  License: GPLv2 - http://www.gnu.org/licenses/gpl-2.0.html
@@ -63,7 +64,7 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 
-	yyparse();
+	retval += yyparse();	// catch unhandled errors
 	fclose(yyin);
 	return retval;
 }
