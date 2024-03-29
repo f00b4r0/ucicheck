@@ -28,7 +28,7 @@
 %option nodebug
 %option yylineno
 
-%x PNAM IDENT TYP DATA ERROR
+%x PNAM IDENT TYP DATA DATAN ERROR
 
 IDENTPART		[A-Za-z0-9_]+
 NAMEPART		[-A-Za-z0-9_]+
@@ -37,6 +37,7 @@ TYPECHAR		[\x21-\x7e]
 %{
 	#include "parser.tab.h"
 	extern void yyerror(const char *, ...);
+	extern int no_nl;
 	static const char *obj;
 	static int flags;
 	enum {
@@ -71,10 +72,12 @@ list		{ BEGIN(IDENT); return OPTION; }
 	/* identifiers */
 <IDENT>{IDENTPART}		|
 <IDENT>'{IDENTPART}'		|
-<IDENT>\"{IDENTPART}\"		{ BEGIN(DATA); return IDENTIFIER; }
+<IDENT>\"{IDENTPART}\"		{ if (no_nl) BEGIN(DATAN); else BEGIN(DATA); return IDENTIFIER; }
 
 	/* values */
-<DATA>(\\.|[\x21-\xff]{-}['\"\\])+		|	/* unquoted, without whitespace, possibly escaped */
+<DATA,DATAN>(\\.|[\x21-\xff]{-}['\"\\])+	|	/* unquoted, without whitespace, possibly escaped */
+<DATAN>'(\\.|[\t \x21-\xff]{-}['\\])*'		|	/* single quoted, no newline, possibly escaped */
+<DATAN>\"(\\.|[\t \x21-\xff]{-}[\"\\])*\"	|	/* double quoted, no newline, possibly escaped */
 <DATA>'(\\.|[\t\n\r \x21-\xff]{-}['\\])*'	|	/* single quoted, possibly escaped */
 <DATA>\"(\\.|[\t\n\r \x21-\xff]{-}[\"\\])*\"	{	/* double quoted, possibly escaped */
 				flags |= FL_CHKSP;

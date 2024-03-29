@@ -14,6 +14,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <stdarg.h>
+	#include <unistd.h>
 
 	void yyerror(const char *, ...);
 
@@ -23,6 +24,8 @@
 
 	static const char *filename;
 	static int retval = 0, prevline = 0;
+
+	int no_nl = 0;
 %}
 
 %define parse.error verbose
@@ -56,12 +59,23 @@ values: VALUE | values VALUE ;
 
 int main(int argc, char **argv)
 {
-	if (argc < 2) {
+	int opt;
+
+	while ((opt = getopt(argc, argv, "n")) != -1) {
+		if ('n' == opt)		// 'n' does not permit embedded new lines in string litterals
+			no_nl = 1;
+		else {
+			fprintf(stderr, "Usage: %s [-n] file\n", argv[0]);
+			exit(-1);
+		}
+	}
+
+	if (optind >= argc) {
 		fprintf(stderr, "Missing filename!\n");
 		exit(-1);
 	}
 
-	filename = argv[1];
+	filename = argv[optind];
 	if (!(yyin = fopen(filename, "r"))) {
 		perror(filename);
 		exit(-1);
