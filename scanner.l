@@ -32,7 +32,7 @@
 
 IDENTPART		[A-Za-z0-9_]+
 NAMEPART		[-A-Za-z0-9_]+
-TYPEPART		[\x21-\x7e]{-}['\"]+
+TYPECHAR		[\x21-\x7e]
 
 %{
 	#include "parser.tab.h"
@@ -64,9 +64,9 @@ list		{ BEGIN(IDENT); return OPTION; }
 <PNAM>\"{NAMEPART}\"		{ return NAME; }
 
 	/* types */
-<TYP>{TYPEPART}			|
-<TYP>'{TYPEPART}'		|
-<TYP>\"{TYPEPART}\"		{ BEGIN(IDENT); return TYPE; }
+<TYP>(\\{TYPECHAR}|[\x21-\x7e]{-}['\"\\])+	|
+<TYP>'(\\{TYPECHAR}|[\x21-\x7e]{-}['\\])+'	|
+<TYP>\"(\\{TYPECHAR}|[\x21-\x7e]{-}[\"\\])+\"	{ BEGIN(IDENT); return TYPE; }
 
 	/* identifiers */
 <IDENT>{IDENTPART}		|
