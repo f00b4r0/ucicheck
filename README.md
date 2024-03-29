@@ -40,3 +40,9 @@ Example:
 ```sh
 ucicheck config/system
 ````
+
+## Notes
+
+Due to UCI allowing embedded new lines in quoted literals,
+unterminated quoted multi-line strings may typically be reported out of sync
+(or not at all if a subsequent unbalanced closing quote terminates the unbalanced opening one).
