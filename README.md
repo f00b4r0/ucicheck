@@ -30,15 +30,15 @@ To build, run `make`
 
 ## Usage
 
-The tool accepts a single argument: a path to a UCI configuration file.
+The tool takes a path to a UCI configuration file as argument.
 
 If the syntax is valid, no output is emitted and the tool returns a 0 exit code.
 Otherwise, error messages are printed and a non-zero exit code is returned.
 
-Example:
+Usage:
 
 ```sh
-ucicheck config/system
+ucicheck [-n] filename
 ````
 
 ## Notes
@@ -46,3 +46,6 @@ ucicheck config/system
 Due to UCI allowing embedded new lines in quoted literals,
 unterminated quoted multi-line strings may typically be reported out of sync
 (or not at all if a subsequent unbalanced closing quote terminates the unbalanced opening one).
+
+In order to help debugging these cases, calling this tool with the `-n` option
+switches to a stricter subset of the UCI syntax which does not allow embedded new lines in string literals.
