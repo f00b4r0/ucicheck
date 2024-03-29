@@ -29,7 +29,7 @@
 %verbose
 
 %token PACKAGE CONFIG OPTION NEWLINE
-%token IDENTIFIER VALUE
+%token NAME IDENTIFIER TYPE VALUE
 
 %%
 
@@ -41,12 +41,15 @@ stmtlist: /* empty */
 	| stmtlist error NEWLINE	{ yyerrok; if (++retval >= 10) { fprintf(stderr, "TOO MANY ERRORS, ABORTING!\n"); YYABORT; } }
 ;
 
-stmt:	PACKAGE IDENTIFIER
-	| CONFIG IDENTIFIER
-	| CONFIG IDENTIFIER VALUE
+stmt:	PACKAGE NAME
+	| CONFIG TYPE
+	| CONFIG TYPE IDENTIFIER
 	| OPTION IDENTIFIER		{ if (!YYRECOVERING()) { prevline = 1; yyerror("missing value"); YYERROR; } }
-	| OPTION IDENTIFIER VALUE
+	| OPTION IDENTIFIER values
 ;
+
+/* handle implicit concatenation */
+values: VALUE | values VALUE ;
 
 %%
 
