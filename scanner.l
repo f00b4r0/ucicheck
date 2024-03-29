@@ -74,9 +74,9 @@ list		{ BEGIN(IDENT); return OPTION; }
 <IDENT>\"{IDENTPART}\"		{ BEGIN(DATA); return IDENTIFIER; }
 
 	/* values */
-<DATA>(\\.|[\x21-\xff]{-}['\"])+		|	/* unquoted, without whitespace, possibly escaped */
-<DATA>'(\\.|[\t\n\r \x21-\xff]{-}['])*'		|	/* single quoted, possibly escaped */
-<DATA>\"(\\.|[\t\n\r \x21-\xff]{-}[\"])*\"	{	/* double quoted, possibly escaped */
+<DATA>(\\.|[\x21-\xff]{-}['\"\\])+		|	/* unquoted, without whitespace, possibly escaped */
+<DATA>'(\\.|[\t\n\r \x21-\xff]{-}['\\])*'	|	/* single quoted, possibly escaped */
+<DATA>\"(\\.|[\t\n\r \x21-\xff]{-}[\"\\])*\"	{	/* double quoted, possibly escaped */
 				flags |= FL_CHKSP;
 				if (flags & FL_SP) {
 					yyerror("spurious whitespace in value");
