@@ -109,6 +109,7 @@ list		{ BEGIN(IDENT); return OPTION; }
 					obj = "indentifier";
 					break;
 				case DATA:
+				case DATAN:
 					obj = "value";
 					break;
 				default:
