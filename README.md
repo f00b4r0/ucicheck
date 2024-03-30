@@ -49,3 +49,5 @@ unterminated quoted multi-line strings may typically be reported out of sync
 
 In order to help debugging these cases, calling this tool with the `-n` option
 switches to a stricter subset of the UCI syntax which does not allow embedded new lines in string literals.
+
+Syntax errors triggered by unexpected NEWLINE usually affect the line prior to the one reported.

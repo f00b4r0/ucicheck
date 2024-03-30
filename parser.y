@@ -23,7 +23,7 @@
 	extern FILE *yyin;
 
 	static const char *filename;
-	static int retval = 0, prevline = 0;
+	static int retval = 0;
 
 	int no_nl = 0;
 %}
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 	int opt;
 
 	while ((opt = getopt(argc, argv, "n")) != -1) {
-		if ('n' == opt)		// 'n' does not permit embedded new lines in string litterals
+		if ('n' == opt)		// 'n' does not permit embedded new lines in string literals
 			no_nl = 1;
 		else {
 			fprintf(stderr, "Usage: %s [-n] file\n", argv[0]);
@@ -90,10 +90,9 @@ void yyerror(const char *msg, ...)
 	va_list ap;
 
 	va_start(ap, msg);
-	fprintf(stderr, "%s: error line %d: ", filename, yylineno-prevline);
+	fprintf(stderr, "%s: error line %d: ", filename, yylineno);
 	vfprintf(stderr, msg, ap);
 	va_end(ap);
 	fprintf(stderr, "\n");
-	prevline = 0;
 }
 
