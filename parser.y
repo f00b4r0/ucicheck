@@ -47,7 +47,6 @@ stmtlist: /* empty */
 stmt:	PACKAGE NAME
 	| CONFIG TYPE
 	| CONFIG TYPE IDENTIFIER
-	| OPTION IDENTIFIER		{ if (!YYRECOVERING()) { prevline = 1; yyerror("missing value"); YYERROR; } }
 	| OPTION IDENTIFIER values
 ;
 
